@@ -11,6 +11,12 @@ Rectangle {
     radius: 8 * scaleFactor
     color: hover.hovered ? theme.surface0 : "transparent"
 
+    function durationText(seconds) {
+        const value = Number(seconds || 0);
+        if (value < 60) return Math.floor(value) + "s";
+        if (value < 3600) return Math.floor(value / 60) + "m";
+        return Math.floor(value / 3600) + "h " + Math.floor((value % 3600) / 60) + "m";
+    }
     function stateColor() {
         if (session.state === "Waiting") return theme.yellow;
         if (session.state === "Working") return theme.green;
@@ -21,7 +27,7 @@ Rectangle {
     Column {
         x: 28*root.scaleFactor; anchors.verticalCenter: parent.verticalCenter; width: parent.width-38*root.scaleFactor; spacing: 2*root.scaleFactor
         Text { width: parent.width; text: root.session.title || root.session.projectName || "Codex session"; elide: Text.ElideRight; color: root.theme.text; font.family: root.theme.fontFamily; font.pixelSize: 12*root.scaleFactor; font.bold: true }
-        Text { width: parent.width; text: (root.session.state || "Idle") + (root.session.model ? " · "+root.session.model : ""); elide: Text.ElideRight; color: root.theme.subtext0; font.family: root.theme.fontFamily; font.pixelSize: 10*root.scaleFactor }
+        Text { width: parent.width; text: (root.session.state || "Idle") + (root.session.model ? " · "+root.session.model : "") + (root.session.duration ? " · "+root.durationText(root.session.duration) : ""); elide: Text.ElideRight; color: root.theme.subtext0; font.family: root.theme.fontFamily; font.pixelSize: 10*root.scaleFactor }
     }
     HoverHandler { id: hover; cursorShape: Qt.PointingHandCursor }
     TapHandler { onTapped: root.activated() }

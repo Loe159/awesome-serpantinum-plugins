@@ -36,8 +36,11 @@ ProviderBase {
             availablePermissions = msg.availablePermissions || [];
             recentProjects = msg.recentProjects || [];
             if (!defaultModel && availableModels.length) {
+                const sessions = activeSessions.concat(recentSessions);
+                const recentModel = sessions.length ? sessions[0].model : "";
+                const habitual = recentModel ? availableModels.find(m => m.id === recentModel) : null;
                 const d = availableModels.find(m => m.isDefault);
-                defaultModel = d ? d.id : availableModels[0].id;
+                defaultModel = habitual ? habitual.id : (d ? d.id : availableModels[0].id);
             }
             if (!defaultPermission && availablePermissions.length) {
                 const w = availablePermissions.find(p => p.id === ":workspace" || p.id === "workspace-write");

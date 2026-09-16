@@ -89,9 +89,12 @@ def attach_process(session, processes):
     cwd=session.get("projectPath") or ""
     sid=session.get("id") or ""
     exact=[p for p in processes if sid and sid in p["args"]]
-    matches=exact or [p for p in processes if cwd and p["cwd"]==cwd]
-    if len(matches)==1:
-        session["processId"]=matches[0]["pid"]
+    if len(exact)==1:
+        session["processId"]=exact[0]["pid"]
+        return session
+    cwd_matches=[p for p in processes if cwd and p["cwd"]==cwd]
+    if len(cwd_matches)==1:
+        session["processId"]=cwd_matches[0]["pid"]
     return session
 
 def quota_items(rate):
@@ -109,7 +112,7 @@ def snapshot(rpc, recent_count=10, with_messages=True):
     processes=process_candidates(); active=[]; recent=[]; claimed_pids=set()
     for t in threads:
         state=status_of(t)
-        s={"id":t.get("id", ""),"provider":"codex","title":title_of(t),"projectName":pathlib.Path((t.get("cwd") or "").rstrip("/")).name,"projectPath":t.get("cwd") or "","model":t.get("model") or "","state":state,"startedAt":t.get("createdAt"),"updatedAt":t.get("updatedAt"),"lastMessage":"","processId":0,"terminalWindowId":"","resumable":True}
+        s={"id":t.get("id", ""),"provider":"codex","title":title_of(t),"projectName":pathlib.Path((t.get("cwd") or "").rstrip("/")).name,"projectPath":t.get("cwd") or "","model":t.get("model") or "","state":state,"startedAt":t.get("createdAt"),"updatedAt":t.get("updatedAt"),"duration":max(0,int(time.time()-(t.get("createdAt") or time.time()))),"lastMessage":"","processId":0,"terminalWindowId":"","resumable":True}
         attach_process(s,processes)
         if state == "Idle" and s.get("processId") and s["processId"] not in claimed_pids:
             state = s["state"] = "Working"

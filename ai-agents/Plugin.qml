@@ -62,6 +62,7 @@ Item {
 
     CodexProvider { id: codex; pluginDirectory: root.pluginDirectory; services: root.hostServices }
     Component.onCompleted: applySettings()
+    onHostServicesChanged: applySettings()
 
     PanelWindow {
         id: panel; visible: root.panelVisible; screen: root.panelScreen || ((Quickshell.screens&&Quickshell.screens.length)?Quickshell.screens[0]:null); color:"transparent"
