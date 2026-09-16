@@ -1,0 +1,29 @@
+{
+  "id": "ai-agents",
+  "name": "AI Agents",
+  "version": "0.1.0",
+  "apiVersion": 1,
+  "entry": "Plugin.qml",
+  "enabledByDefault": true,
+  "topbarByDefault": false,
+  "capabilities": [
+    "panel",
+    "bar",
+    "notifications"
+  ],
+  "icon": "󰚩",
+  "barColor": "green",
+  "description": "Monitor and launch local AI coding agents from Serpantinum.",
+  "barEntries": [
+    {
+      "id": "codex",
+      "provider": "codex",
+      "name": "Codex",
+      "label": "Codex",
+      "icon": "󰚩",
+      "entry": "ui/ProviderBarEntry.qml",
+      "enabledSetting": "codexEnabled",
+      "enabledByDefault": true
+    }
+  ]
+}
