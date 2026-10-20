@@ -5,19 +5,13 @@
   "apiVersion": 1,
   "entry": "Plugin.qml",
   "enabledByDefault": true,
-  "topbarByDefault": false,
-  "capabilities": ["panel", "bar"],
+  "topbarByDefault": true,
+  "capabilities": [
+    "panel",
+    "bar"
+  ],
   "icon": "󰬛",
   "barColor": "mauve",
   "description": "Suivi quotidien et lancement rapide de LPIC Daily.",
-  "barEntries": [
-    {
-      "id": "daily",
-      "name": "LPIC Daily",
-      "label": "LPIC",
-      "icon": "󰬛",
-      "entry": "ui/BarEntry.qml",
-      "enabledByDefault": true
-    }
-  ]
+  "barEntry": "ui/BarEntry.qml"
 }
