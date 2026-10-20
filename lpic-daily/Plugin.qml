@@ -185,7 +185,12 @@ Item {
             anchors.fill: parent
             MouseArea {
                 anchors.fill: parent
-                onClicked: root.closePanel()
+                onClicked: function(mouse) {
+                    if (mouse.x < card.x || mouse.x > card.x + card.width
+                            || mouse.y < card.y || mouse.y > card.y + card.height) {
+                        root.closePanel();
+                    }
+                }
             }
         }
 
@@ -223,8 +228,6 @@ Item {
                 y: root.panelOpen ? 0 : (root.panelBarPosition === "bottom" ? root.s(7) : -root.s(7))
                 Behavior on y { NumberAnimation { duration: 230; easing.type: Easing.OutQuint } }
             }
-
-            MouseArea { anchors.fill: parent; onClicked: {} }
 
             ColumnLayout {
                 id: content
