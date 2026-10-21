@@ -1,0 +1,36 @@
+name: Todoist plugin validation
+
+on:
+  push:
+    paths:
+      - "todoist/**"
+      - ".github/workflows/todoist.yml"
+  pull_request:
+    paths:
+      - "todoist/**"
+      - ".github/workflows/todoist.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate manifest and OAuth bridge
+        run: |
+          python3 -m json.tool todoist/plugin.json >/dev/null
+          python3 -m py_compile todoist/services/todoist.py
+          python3 -m unittest discover -s todoist/services -p 'test_*.py' -v
+      - name: Parse plugin QML
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq qt6-declarative-dev-tools
+          /usr/lib/qt6/bin/qmlformat todoist/Plugin.qml >/dev/null
+          /usr/lib/qt6/bin/qmlformat todoist/Settings.qml >/dev/null
+          /usr/lib/qt6/bin/qmlformat todoist/ui/BarEntry.qml >/dev/null
+          /usr/lib/qt6/bin/qmlformat todoist/ui/ControlButton.qml >/dev/null
+          /usr/lib/qt6/bin/qmlformat todoist/ui/TaskRow.qml >/dev/null
+      - name: Validate SVG logo
+        run: python3 -c 'import xml.etree.ElementTree as ET; ET.parse("todoist/assets/todoist.svg")'
