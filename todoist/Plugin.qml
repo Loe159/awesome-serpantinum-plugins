@@ -83,6 +83,13 @@ Item {
         refresh();
     }
 
+    Connections {
+        target: root.hostServices ? root.hostServices.config : null
+        ignoreUnknownSignals: true
+        function onSettingsLoaded() { root.settingsRevision++; }
+        function onRawSettingsChanged() { root.settingsRevision++; }
+    }
+
     function syncPanelContext(host) {
         if (host && host.barSection) panelSection = host.barSection;
         else if (hostServices && hostServices.pluginManager)
@@ -213,7 +220,12 @@ Item {
 
     Timer { id: openDelay; interval: 12; onTriggered: root.panelOpen = true }
     Timer { id: hideDelay; interval: 170; onTriggered: if (!root.panelOpen) root.panelVisible = false }
-    Timer { interval: 300000; running: true; repeat: true; onTriggered: root.refresh() }
+    Timer {
+        interval: Math.max(1, Math.min(60, Number(root.setting("syncIntervalMinutes", 5)) || 5)) * 60000
+        running: true
+        repeat: true
+        onTriggered: root.refresh()
+    }
     Timer {
         interval: 4000
         running: root.authorizing

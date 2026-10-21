@@ -421,7 +421,9 @@ def main():
     if op == "auth-status":
         creds = secret_read()
         pending = read_json(AUTH_MARK, {})
-        return {"connected": bool(creds), "authorizing": bool(pending and time.time() - pending.get("started", 0) < 190)}
+        return {"connected": bool(creds),
+                "authorizing": bool(pending and time.time() - pending.get("started", 0) < 190),
+                "error": (read_json(AUTH_ERR, {}) or {}).get("error", "") if not creds else ""}
     if op == "login":
         return login()
     if op == "logout":
