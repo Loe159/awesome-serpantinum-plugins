@@ -31,6 +31,29 @@ Item {
     readonly property var progress: hasStatus ? statusData.progress : ({})
     readonly property var activity: hasStatus ? statusData.activity : ({})
     readonly property var nextActivity: hasStatus ? (statusData.session.next || null) : null
+    property int displayedRemaining: 0
+    property bool counterInitialized: false
+
+    onStatusDataChanged: {
+        if (!statusData) {
+            counterInitialized = false;
+            displayedRemaining = 0;
+            return;
+        }
+        const latest = Math.max(0, Number(statusData.session.remaining || 0));
+        if (!counterInitialized || !panelVisible) {
+            counterAnimation.stop();
+            counterLabel.opacity = 1;
+            countShift.y = 0;
+            displayedRemaining = latest;
+            counterInitialized = true;
+        } else if (latest !== displayedRemaining) {
+            counterAnimation.stop();
+            counterLabel.opacity = 1;
+            countShift.y = 0;
+            counterAnimation.start();
+        }
+    }
 
     QtObject {
         id: fallbackTheme
@@ -120,6 +143,24 @@ Item {
             closePanel();
         } catch (e) {
             errorMessage = "Impossible d'ouvrir le terminal : " + String(e);
+        }
+    }
+
+    SequentialAnimation {
+        id: counterAnimation
+        ParallelAnimation {
+            NumberAnimation { target: counterLabel; property: "opacity"; to: 0; duration: 80 }
+            NumberAnimation { target: countShift; property: "y"; to: -root.s(4); duration: 80; easing.type: Easing.InCubic }
+        }
+        ScriptAction {
+            script: {
+                root.displayedRemaining = root.remaining;
+                countShift.y = root.s(4);
+            }
+        }
+        ParallelAnimation {
+            NumberAnimation { target: counterLabel; property: "opacity"; to: 1; duration: 140; easing.type: Easing.OutCubic }
+            NumberAnimation { target: countShift; property: "y"; to: 0; duration: 140; easing.type: Easing.OutQuint }
         }
     }
 
@@ -229,11 +270,13 @@ Item {
             }
             opacity: root.panelOpen ? 1 : 0
             scale: root.panelOpen ? 1 : 0.975
-            Behavior on opacity { NumberAnimation { duration: 170; easing.type: Easing.OutCubic } }
-            Behavior on scale { NumberAnimation { duration: 240; easing.type: Easing.OutQuint } }
+            Behavior on opacity { NumberAnimation { duration: root.panelOpen ? 220 : 140; easing.type: Easing.OutCubic } }
+            Behavior on scale { NumberAnimation { duration: root.panelOpen ? 220 : 140; easing.type: Easing.OutQuint } }
             transform: Translate {
-                y: root.panelOpen ? 0 : (root.panelBarPosition === "bottom" ? root.s(7) : -root.s(7))
-                Behavior on y { NumberAnimation { duration: 230; easing.type: Easing.OutQuint } }
+                x: root.panelOpen ? 0 : (root.panelBarPosition === "left" ? -root.s(8) : (root.panelBarPosition === "right" ? root.s(8) : 0))
+                y: root.panelOpen ? 0 : (root.panelBarPosition === "bottom" ? root.s(8) : (root.panelBarPosition === "top" ? -root.s(8) : 0))
+                Behavior on x { NumberAnimation { duration: root.panelOpen ? 220 : 140; easing.type: Easing.OutQuint } }
+                Behavior on y { NumberAnimation { duration: root.panelOpen ? 220 : 140; easing.type: Easing.OutQuint } }
             }
 
             ColumnLayout {
@@ -241,10 +284,11 @@ Item {
                 x: root.s(18)
                 y: root.s(17)
                 width: parent.width - root.s(36)
-                spacing: root.s(13)
+                spacing: 0
 
                 RowLayout {
                     Layout.fillWidth: true
+                    Layout.bottomMargin: root.s(16)
                     spacing: root.s(10)
 
                     Rectangle {
@@ -274,6 +318,8 @@ Item {
                         radius: root.s(8)
                         color: refreshHover.hovered ? root.theme.surface1 : root.theme.surface0
                         Behavior on color { ColorAnimation { duration: 170 } }
+                        scale: refreshTap.pressed ? 0.985 : (refreshHover.hovered ? 1.015 : 1)
+                        Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
                         Text {
                             anchors.centerIn: parent
                             text: "󰑐"
@@ -286,17 +332,20 @@ Item {
                             }
                         }
                         HoverHandler { id: refreshHover; cursorShape: Qt.PointingHandCursor }
-                        TapHandler { onTapped: root.refresh() }
+                        TapHandler { id: refreshTap; onTapped: root.refresh() }
                     }
                 }
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: root.s(3)
+                    Layout.bottomMargin: root.s(16)
+                    spacing: root.s(4)
                     RowLayout {
                         spacing: root.s(7)
                         Text {
-                            text: root.hasStatus ? String(root.remaining) : "—"
+                            id: counterLabel
+                            text: root.hasStatus ? String(root.displayedRemaining) : "—"
+                            transform: Translate { id: countShift; y: 0 }
                             font.family: root.theme.fontFamily
                             font.pixelSize: root.s(31)
                             font.weight: Font.Bold
@@ -324,15 +373,19 @@ Item {
                 Rectangle {
                     id: nextCard
                     Layout.fillWidth: true
-                    implicitHeight: root.s(85)
+                    implicitHeight: nextContent.implicitHeight + root.s(24)
+                    Layout.bottomMargin: root.s(12)
                     radius: root.s(10)
+                    scale: nextTap.pressed ? 0.985 : (nextHover.hovered && !!root.nextActivity && !root.statusStale ? 1.015 : 1)
+                    Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
                     color: nextHover.hovered && root.nextActivity && !root.statusStale
                         ? root.theme.surface1 : root.theme.surface0
                     Behavior on color { ColorAnimation { duration: 180; easing.type: Easing.OutCubic } }
                     ColumnLayout {
+                        id: nextContent
                         anchors.fill: parent
                         anchors.margins: root.s(12)
-                        spacing: root.s(5)
+                        spacing: root.s(8)
                         RowLayout {
                             Layout.fillWidth: true
                             Text {
@@ -385,6 +438,7 @@ Item {
                     }
                     HoverHandler { id: nextHover; enabled: !!root.nextActivity && !root.statusStale; cursorShape: Qt.PointingHandCursor }
                     TapHandler {
+                        id: nextTap
                         enabled: !!root.nextActivity && root.nextActivity.actionKind !== "" && !root.statusStale
                         onTapped: root.launch("next")
                     }
@@ -394,8 +448,11 @@ Item {
                     id: launchButton
                     Layout.fillWidth: true
                     implicitHeight: root.s(40)
+                    Layout.bottomMargin: root.s(16)
                     radius: root.s(10)
                     opacity: root.hasStatus && !root.statusStale ? 1 : 0.48
+                    scale: launchTap.pressed ? 0.985 : (launchHover.hovered && root.hasStatus && !root.statusStale ? 1.015 : 1)
+                    Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
                     color: launchHover.hovered ? Qt.lighter(root.theme.mauve, 1.09) : root.theme.mauve
                     Behavior on color { ColorAnimation { duration: 180 } }
                     RowLayout {
@@ -416,13 +473,19 @@ Item {
                         }
                     }
                     HoverHandler { id: launchHover; enabled: root.hasStatus && !root.statusStale; cursorShape: Qt.PointingHandCursor }
-                    TapHandler { enabled: root.hasStatus && !root.statusStale; onTapped: root.launch("dashboard") }
+                    TapHandler { id: launchTap; enabled: root.hasStatus && !root.statusStale; onTapped: root.launch("dashboard") }
                 }
 
-                Rectangle { Layout.fillWidth: true; implicitHeight: root.s(1); color: root.theme.surface1 }
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.bottomMargin: root.s(16)
+                    implicitHeight: root.s(1)
+                    color: root.theme.surface1
+                }
 
                 RowLayout {
                     Layout.fillWidth: true
+                    Layout.bottomMargin: root.s(10)
                     Text {
                         Layout.fillWidth: true
                         text: "Progression"
@@ -440,25 +503,28 @@ Item {
                 }
 
                 Repeater {
-                    model: [
-                        {name: "Couverture", value: root.hasStatus ? root.progress.coveragePercent : 0},
-                        {name: "Maîtrise", value: root.hasStatus ? root.progress.masteryPercent : 0}
-                    ]
+                    model: 2
                     ColumnLayout {
-                        required property var modelData
+                        id: progressItem
+                        required property int index
+                        readonly property string metricName: index === 0 ? "Couverture" : "Maîtrise"
+                        readonly property real metricValue: root.hasStatus
+                            ? Number(index === 0 ? root.progress.coveragePercent : root.progress.masteryPercent) || 0
+                            : 0
                         Layout.fillWidth: true
-                        spacing: root.s(5)
+                        Layout.bottomMargin: root.s(12)
+                        spacing: root.s(6)
                         RowLayout {
                             Layout.fillWidth: true
                             Text {
                                 Layout.fillWidth: true
-                                text: modelData.name
+                                text: progressItem.metricName
                                 font.family: root.theme.fontFamily
                                 font.pixelSize: root.s(11)
                                 color: root.theme.subtext0
                             }
                             Text {
-                                text: modelData.value + "%"
+                                text: Math.round(progressItem.metricValue) + "%"
                                 font.family: root.theme.fontFamily
                                 font.pixelSize: root.s(11)
                                 font.weight: Font.DemiBold
@@ -472,19 +538,25 @@ Item {
                             color: root.theme.surface1
                             Rectangle {
                                 height: parent.height
-                                width: parent.width * Math.max(0, Math.min(100, modelData.value)) / 100
+                                width: parent.width * Math.max(0, Math.min(100, progressItem.metricValue)) / 100
                                 radius: height / 2
                                 color: root.theme.mauve
-                                Behavior on width { NumberAnimation { duration: 500; easing.type: Easing.OutQuint } }
+                                Behavior on width { NumberAnimation { duration: 350; easing.type: Easing.OutQuint } }
                             }
                         }
                     }
                 }
 
-                Rectangle { Layout.fillWidth: true; implicitHeight: root.s(1); color: root.theme.surface1 }
-
-                RowLayout {
+                Rectangle {
                     Layout.fillWidth: true
+                    Layout.bottomMargin: root.s(12)
+                    implicitHeight: root.s(1)
+                    color: root.theme.surface1
+                }
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: root.s(8)
                     Text {
                         Layout.fillWidth: true
                         text: "14 derniers jours"
