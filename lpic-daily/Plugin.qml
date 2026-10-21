@@ -505,6 +505,7 @@ Item {
                 Repeater {
                     model: 2
                     ColumnLayout {
+                        id: progressItem
                         required property int index
                         readonly property string metricName: index === 0 ? "Couverture" : "Maîtrise"
                         readonly property real metricValue: root.hasStatus
@@ -517,13 +518,13 @@ Item {
                             Layout.fillWidth: true
                             Text {
                                 Layout.fillWidth: true
-                                text: metricName
+                                text: progressItem.metricName
                                 font.family: root.theme.fontFamily
                                 font.pixelSize: root.s(11)
                                 color: root.theme.subtext0
                             }
                             Text {
-                                text: Math.round(metricValue) + "%"
+                                text: Math.round(progressItem.metricValue) + "%"
                                 font.family: root.theme.fontFamily
                                 font.pixelSize: root.s(11)
                                 font.weight: Font.DemiBold
@@ -537,7 +538,7 @@ Item {
                             color: root.theme.surface1
                             Rectangle {
                                 height: parent.height
-                                width: parent.width * Math.max(0, Math.min(100, metricValue)) / 100
+                                width: parent.width * Math.max(0, Math.min(100, progressItem.metricValue)) / 100
                                 radius: height / 2
                                 color: root.theme.mauve
                                 Behavior on width { NumberAnimation { duration: 350; easing.type: Easing.OutQuint } }
