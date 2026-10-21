@@ -10,6 +10,7 @@ Rectangle {
     height: 54 * scaleFactor
     radius: 8 * scaleFactor
     color: hover.hovered ? theme.surface0 : "transparent"
+    z: hover.hovered ? 100 : 0
 
     function durationText(seconds) {
         const value = Number(seconds || 0);
