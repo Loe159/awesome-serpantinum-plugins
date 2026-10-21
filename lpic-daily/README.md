@@ -57,3 +57,8 @@ badge de certification ni d'une affiliation officielle.
 La carte du plugin utilise l'option `iconImage`, disponible dans le gestionnaire
 de plugins Serpantinum mis à jour. La Bar et la popup utilisent leur propre
 composant vectoriel et gardent la couleur du thème à chaud.
+
+Après une synchronisation Git réussie, le gestionnaire Serpantinum récent
+recharge Quickshell pour appliquer les nouvelles versions QML. Le manifeste
+incrémente la version à chaque mise à jour du plugin pour permettre de vérifier
+l'installation depuis Paramètres → Plugins.
