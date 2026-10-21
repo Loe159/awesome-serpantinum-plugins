@@ -23,8 +23,8 @@ Item {
 
         LpiLogo {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.preferredWidth: host ? host.s(host.compact ? 12 : 14) : 14
-            Layout.preferredHeight: host ? host.s(host.compact ? 12 : 14) : 14
+            Layout.preferredWidth: host ? host.s(host.compact ? 16 : 18) : 18
+            Layout.preferredHeight: host ? host.s(host.compact ? 16 : 18) : 18
             tint: root.accent
         }
 
