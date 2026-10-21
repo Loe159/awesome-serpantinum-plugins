@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "."
 
 Item {
     id: root
@@ -23,8 +24,8 @@ Item {
 
         LpiLogo {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.preferredWidth: host ? host.s(host.compact ? 16 : 18) : 18
-            Layout.preferredHeight: host ? host.s(host.compact ? 16 : 18) : 18
+            Layout.preferredWidth: host ? host.s(host.compact ? 18 : 20) : 20
+            Layout.preferredHeight: host ? host.s(host.compact ? 18 : 20) : 20
             tint: root.accent
         }
 

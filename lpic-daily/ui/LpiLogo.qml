@@ -11,6 +11,11 @@ Item {
         width: 24
         height: 24
         scale: Math.min(root.width, root.height) / 24
+        // Render the vector at 4x resolution before downscaling to Bar size.
+        layer.enabled: true
+        layer.textureSize: Qt.size(96, 96)
+        layer.smooth: true
+        layer.mipmap: true
 
         ShapePath {
             strokeColor: "transparent"

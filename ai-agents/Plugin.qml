@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import "providers"
-import "ui"
+import "ui" as AgentUI
 
 Item {
     id: root
@@ -121,17 +121,17 @@ Item {
         Flickable { contentWidth:width; contentHeight:body.implicitHeight; clip:true
             Column { id:body; width:parent.width; spacing:root.s(8)
                 Row { width:parent.width; spacing:root.s(8)
-                    Repeater { model:codex.quotaItems.filter(q => (q.id!=="primary"||codex.show5hQuota)&&(q.id!=="secondary"||codex.showWeeklyQuota)); QuotaCard { required property var modelData; quota:modelData; theme:root.theme; scaleFactor:root.s(1) } }
+                    Repeater { model:codex.quotaItems.filter(q => (q.id!=="primary"||codex.show5hQuota)&&(q.id!=="secondary"||codex.showWeeklyQuota)); AgentUI.QuotaCard { required property var modelData; quota:modelData; theme:root.theme; scaleFactor:root.s(1) } }
                 }
                 Row { width:parent.width; Text { text:"Active"; color:root.theme.subtext0; font.family:root.theme.fontFamily; font.bold:true } Item { width:parent.width-root.s(100); height:1 } Button { text:"+ New agent"; onClicked:root.showNewAgent=true } }
-                Repeater { model:codex.activeSessions; AgentRow { required property var modelData; width:body.width; session:modelData; theme:root.theme; scaleFactor:root.s(1); onActivated:codex.focus(session) } }
+                Repeater { model:codex.activeSessions; AgentUI.AgentRow { required property var modelData; width:body.width; session:modelData; theme:root.theme; scaleFactor:root.s(1); onActivated:codex.focus(session) } }
                 Text { visible:codex.activeSessions.length===0; text:"No active agents"; color:root.theme.overlay1; font.family:root.theme.fontFamily; font.pixelSize:root.s(10) }
                 Text { text:"Recent"; color:root.theme.subtext0; font.family:root.theme.fontFamily; font.bold:true; topPadding:root.s(6) }
-                Repeater { model:codex.recentSessions; AgentRow { required property var modelData; width:body.width; session:modelData; theme:root.theme; scaleFactor:root.s(1); onActivated:codex.resume(session) } }
+                Repeater { model:codex.recentSessions; AgentUI.AgentRow { required property var modelData; width:body.width; session:modelData; theme:root.theme; scaleFactor:root.s(1); onActivated:codex.resume(session) } }
             }
         }
     }
-    Component { id:newAgentComponent; NewAgentView { provider:codex; theme:root.theme; scaleFactor:root.s(1); onCloseRequested:root.showNewAgent=false } }
+    Component { id:newAgentComponent; AgentUI.NewAgentView { provider:codex; theme:root.theme; scaleFactor:root.s(1); onCloseRequested:root.showNewAgent=false } }
     Component { id:settingsComponent
         Flickable { contentWidth:width; contentHeight:settingsCol.implicitHeight; clip:true
             ColumnLayout { id:settingsCol; width:parent.width; spacing:root.s(10)
