@@ -461,16 +461,6 @@ Item {
                         font.pixelSize: root.s(17)
                         font.weight: Font.DemiBold
                     }
-                    Text {
-                        Layout.alignment: Qt.AlignHCenter
-                        Layout.maximumWidth: root.s(300)
-                        text: "Retrouvez vos tâches et projets sans quitter Serpantinum."
-                        color: root.theme.subtext0
-                        wrapMode: Text.Wrap
-                        horizontalAlignment: Text.AlignHCenter
-                        font.family: root.theme.fontFamily
-                        font.pixelSize: root.s(12)
-                    }
                     UI.ControlButton {
                         Layout.alignment: Qt.AlignHCenter
                         palette: root.theme; factor: root.s(1)
@@ -874,11 +864,6 @@ Item {
                         }
                     }
                     Rectangle { Layout.fillWidth: true; height: root.s(1); color: root.theme.surface1 }
-                    Text {
-                        text: "Synchronisation : 5 min + ouverture + Refresh"
-                        color: root.theme.subtext0
-                        font.pixelSize: root.s(11)
-                    }
                     RowLayout {
                         Layout.fillWidth: true
                         Text {
@@ -925,13 +910,6 @@ Item {
                         }
                     }
                     Item { Layout.fillHeight: true }
-                    Text {
-                        Layout.fillWidth: true
-                        text: "Les identifiants sont stockés dans le trousseau Linux (Secret Service)."
-                        wrapMode: Text.Wrap
-                        color: root.theme.subtext0
-                        font.pixelSize: root.s(10)
-                    }
                     UI.ControlButton {
                         Layout.alignment: Qt.AlignRight
                         palette: root.theme; factor: root.s(1); label: "Retour"
