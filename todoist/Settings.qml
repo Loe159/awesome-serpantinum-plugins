@@ -44,7 +44,7 @@ Item {
     function beginLogin() {
         if (connecting || connected || !pluginDirectory) return;
         errorMessage = "";
-        feedback = "Autorisez l'accès à vos tâches dans le navigateur.";
+        feedback = "Terminez la connexion dans votre navigateur.";
         loginStarted = Date.now();
         connecting = true;
         try {
@@ -66,8 +66,8 @@ Item {
     function refreshTasks() {
         if (pluginInstance && pluginInstance.refresh) {
             pluginInstance.refresh();
-            feedback = "Actualisation demandée.";
-        } else feedback = "Activez le plugin pour actualiser ses tâches.";
+            feedback = "";
+        } else errorMessage = "Activez le plugin pour actualiser.";
     }
 
     onPluginDirectoryChanged: refreshAuth()
@@ -116,7 +116,7 @@ Item {
                         root.connecting = false;
                         root.confirmLogout = false;
                         root.errorMessage = "";
-                        root.feedback = "Compte connecté.";
+                        root.feedback = "";
                     } else if (root.connecting && !root.authorizing && data.error) {
                         root.connecting = false;
                         root.feedback = "";
@@ -152,7 +152,7 @@ Item {
             if (code === 0) {
                 root.connected = false;
                 root.connecting = false;
-                root.feedback = "Compte déconnecté.";
+                root.feedback = "";
                 if (root.pluginInstance && root.pluginInstance.refresh) root.pluginInstance.refresh();
             } else if (!root.errorMessage) root.errorMessage = "Déconnexion impossible.";
             root.refreshAuth();
@@ -171,7 +171,7 @@ Item {
         ColumnLayout {
             id: content
             width: scroll.width
-            spacing: root.s(9)
+            spacing: root.s(7)
 
             RowLayout {
                 Layout.fillWidth: true
@@ -185,11 +185,13 @@ Item {
                     smooth: true
                     mipmap: true
                 }
-                ColumnLayout {
-                    spacing: root.s(2)
+                Text {
                     Layout.fillWidth: true
-                    Text { text: "Todoist"; color: root.theme.text; font.family: root.theme.fontFamily; font.pixelSize: root.s(22); font.weight: Font.Bold }
-                    Text { text: "Compte, synchronisation et notifications"; color: root.theme.subtext0; font.family: root.theme.fontFamily; font.pixelSize: root.s(11) }
+                    text: "Todoist"
+                    color: root.theme.text
+                    font.family: root.theme.fontFamily
+                    font.pixelSize: root.s(22)
+                    font.weight: Font.Bold
                 }
             }
             Text {
@@ -208,7 +210,7 @@ Item {
             Text { text: "Compte"; color: root.theme.subtext0; font.family: root.theme.fontFamily; font.pixelSize: root.s(11); font.weight: Font.DemiBold }
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: accountRow.implicitHeight + root.s(28)
+                implicitHeight: accountRow.implicitHeight + root.s(24)
                 radius: root.theme.borderRadius
                 color: Qt.alpha(root.theme.surface0, 0.5)
                 border.width: 1; border.color: root.theme.surface1
@@ -222,21 +224,17 @@ Item {
                         color: root.connected ? root.theme.green : root.connecting ? root.theme.yellow : root.theme.surface2
                         Behavior on color { ColorAnimation { duration: 180 } }
                     }
-                    ColumnLayout {
-                        Layout.fillWidth: true; spacing: root.s(3)
-                        Text {
-                            text: root.connected ? "Compte connecté" : root.connecting ? "Connexion en cours…" : "Compte non connecté"
-                            color: root.theme.text; font.family: root.theme.fontFamily; font.pixelSize: root.s(13); font.weight: Font.DemiBold
-                        }
-                        Text {
-                            Layout.fillWidth: true; elide: Text.ElideRight
-                            text: root.connected ? "Tâches et projets accessibles" : "Authentification sécurisée par navigateur"
-                            color: root.theme.subtext0; font.family: root.theme.fontFamily; font.pixelSize: root.s(11)
-                        }
+                    Text {
+                        Layout.fillWidth: true
+                        text: root.connected ? "Connecté" : root.connecting ? "Connexion en cours…" : "Non connecté"
+                        color: root.theme.text
+                        font.family: root.theme.fontFamily
+                        font.pixelSize: root.s(13)
+                        font.weight: Font.DemiBold
                     }
                     UI.ControlButton {
                         palette: root.theme; factor: root.s(1)
-                        label: root.connected ? "Déconnecter" : (root.connecting ? "Patientez…" : "Se connecter")
+                        label: root.connected ? "Déconnecter" : (root.connecting ? "Connexion…" : "Se connecter")
                         glyph: root.connected ? "󰍃" : "󰐕"
                         primary: !root.connected; danger: root.connected
                         enabled: !root.connecting && !root.disconnecting
@@ -256,27 +254,43 @@ Item {
                     anchors.leftMargin: root.s(12); anchors.rightMargin: root.s(12); spacing: root.s(10)
                     Text { Layout.fillWidth: true; text: "Déconnecter Todoist ?"; color: root.theme.text; font.pixelSize: root.s(12) }
                     UI.ControlButton { palette: root.theme; factor: root.s(1); label: "Annuler"; onClicked: root.confirmLogout = false }
-                    UI.ControlButton { palette: root.theme; factor: root.s(1); label: "Confirmer"; danger: true; onClicked: root.logout() }
+                    UI.ControlButton { palette: root.theme; factor: root.s(1); label: "Déconnecter"; danger: true; onClicked: root.logout() }
                 }
             }
 
-            Text {
-                text: "Synchronisation"; Layout.topMargin: root.s(8)
-                color: root.theme.subtext0; font.family: root.theme.fontFamily
-                font.pixelSize: root.s(11); font.weight: Font.DemiBold
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: root.s(12)
+                Text {
+                    Layout.fillWidth: true
+                    text: "Synchronisation"
+                    color: root.theme.subtext0
+                    font.family: root.theme.fontFamily
+                    font.pixelSize: root.s(11)
+                    font.weight: Font.DemiBold
+                }
+                UI.ControlButton {
+                    palette: root.theme; factor: root.s(1)
+                    glyph: "󰑐"; label: "Actualiser"
+                    enabled: root.connected && root.pluginInstance !== null
+                    opacity: enabled ? 1 : 0.5
+                    onClicked: { spin(); root.refreshTasks(); }
+                }
             }
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: syncRow.implicitHeight + root.s(28)
+                implicitHeight: syncRow.implicitHeight + root.s(24)
                 radius: root.theme.borderRadius; color: Qt.alpha(root.theme.surface0, 0.5)
                 RowLayout {
                     id: syncRow
                     anchors.left: parent.left; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
                     anchors.leftMargin: root.s(14); anchors.rightMargin: root.s(14); spacing: root.s(9)
-                    ColumnLayout {
-                        Layout.fillWidth: true; spacing: root.s(3)
-                        Text { text: "Synchronisation automatique"; color: root.theme.text; font.family: root.theme.fontFamily; font.pixelSize: root.s(13) }
-                        Text { text: "Également à l'ouverture et après modification"; color: root.theme.subtext0; font.family: root.theme.fontFamily; font.pixelSize: root.s(11) }
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Intervalle"
+                        color: root.theme.text
+                        font.family: root.theme.fontFamily
+                        font.pixelSize: root.s(13)
                     }
                     Repeater {
                         model: [1, 5, 15, 30]
@@ -290,22 +304,6 @@ Item {
                     }
                 }
             }
-            Rectangle {
-                Layout.fillWidth: true
-                implicitHeight: refreshRow.implicitHeight + root.s(24)
-                radius: root.theme.borderRadius; color: Qt.alpha(root.theme.surface0, 0.5)
-                RowLayout {
-                    id: refreshRow
-                    anchors.left: parent.left; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
-                    anchors.leftMargin: root.s(14); anchors.rightMargin: root.s(14)
-                    Text { Layout.fillWidth: true; text: "Actualiser maintenant"; color: root.theme.text; font.family: root.theme.fontFamily; font.pixelSize: root.s(13) }
-                    UI.ControlButton {
-                        palette: root.theme; factor: root.s(1); glyph: "󰑐"; label: "Refresh"
-                        enabled: root.connected; opacity: enabled ? 1 : 0.5
-                        onClicked: { spin(); root.refreshTasks(); }
-                    }
-                }
-            }
 
             Text {
                 text: "Notifications"; Layout.topMargin: root.s(8)
@@ -314,16 +312,18 @@ Item {
             }
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: dueRow.implicitHeight + root.s(28)
+                implicitHeight: dueRow.implicitHeight + root.s(24)
                 radius: root.theme.borderRadius; color: Qt.alpha(root.theme.surface0, 0.5)
                 RowLayout {
                     id: dueRow
                     anchors.left: parent.left; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
                     anchors.leftMargin: root.s(14); anchors.rightMargin: root.s(14); spacing: root.s(10)
-                    ColumnLayout {
-                        Layout.fillWidth: true; spacing: root.s(3)
-                        Text { text: "Échéances proches"; color: root.theme.text; font.family: root.theme.fontFamily; font.pixelSize: root.s(13) }
-                        Text { text: "Notification avant l'heure prévue"; color: root.theme.subtext0; font.family: root.theme.fontFamily; font.pixelSize: root.s(11) }
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Échéances proches"
+                        color: root.theme.text
+                        font.family: root.theme.fontFamily
+                        font.pixelSize: root.s(13)
                     }
                     Loader {
                         id: dueToggle
@@ -366,16 +366,18 @@ Item {
             }
             Rectangle {
                 Layout.fillWidth: true
-                implicitHeight: lateRow.implicitHeight + root.s(28)
+                implicitHeight: lateRow.implicitHeight + root.s(24)
                 radius: root.theme.borderRadius; color: Qt.alpha(root.theme.surface0, 0.5)
                 RowLayout {
                     id: lateRow
                     anchors.left: parent.left; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
                     anchors.leftMargin: root.s(14); anchors.rightMargin: root.s(14); spacing: root.s(10)
-                    ColumnLayout {
-                        Layout.fillWidth: true; spacing: root.s(3)
-                        Text { text: "Tâches en retard"; color: root.theme.text; font.family: root.theme.fontFamily; font.pixelSize: root.s(13) }
-                        Text { text: "Une alerte par tâche et échéance"; color: root.theme.subtext0; font.family: root.theme.fontFamily; font.pixelSize: root.s(11) }
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Tâches en retard"
+                        color: root.theme.text
+                        font.family: root.theme.fontFamily
+                        font.pixelSize: root.s(13)
                     }
                     Loader {
                         id: lateToggle
@@ -392,12 +394,6 @@ Item {
                     }
                     Connections { target: lateToggle.item; ignoreUnknownSignals: true; function onToggled(value) { root.updateSetting("notifyOverdue", value) } }
                 }
-            }
-            Text {
-                Layout.fillWidth: true; Layout.topMargin: root.s(8)
-                text: "Les identifiants OAuth restent dans le trousseau Linux et ne sont jamais enregistrés dans la configuration."
-                color: root.theme.subtext0; font.family: root.theme.fontFamily; font.pixelSize: root.s(10)
-                wrapMode: Text.Wrap
             }
         }
     }
