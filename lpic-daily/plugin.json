@@ -1,7 +1,7 @@
 {
   "id": "lpic-daily",
   "name": "LPIC Daily",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "apiVersion": 1,
   "entry": "Plugin.qml",
   "enabledByDefault": true,
@@ -10,8 +10,9 @@
     "panel",
     "bar"
   ],
-  "icon": "󰬛",
+  "icon": "LPI",
   "barColor": "mauve",
   "description": "Suivi quotidien et lancement rapide de LPIC Daily.",
-  "barEntry": "ui/BarEntry.qml"
+  "barEntry": "ui/BarEntry.qml",
+  "iconImage": "assets/lpi.svg"
 }

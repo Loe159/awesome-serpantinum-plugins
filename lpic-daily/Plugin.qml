@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import "ui" as LPICUI
 
 Item {
     id: root
@@ -49,6 +50,12 @@ Item {
     readonly property var theme: hostServices && hostServices.theme ? hostServices.theme : fallbackTheme
     function s(value) { return hostServices && hostServices.scaler ? hostServices.scaler.s(value) : value; }
     function alpha(color, value) { return Qt.rgba(color.r, color.g, color.b, value); }
+
+    // French labels shared by the three session counters.
+    function counted(value, singular, plural) {
+        const count = Math.max(0, Number(value) || 0);
+        return count + " " + (count === 1 ? singular : plural);
+    }
 
     function terminalCommand() {
         if (!hostServices || !hostServices.config) return "kitty -e";
@@ -245,31 +252,21 @@ Item {
                         Layout.preferredHeight: root.s(34)
                         radius: root.s(9)
                         color: root.theme.surface0
-                        Text {
+                        LPICUI.LpiLogo {
                             anchors.centerIn: parent
-                            text: "󰬛"
-                            font.family: "Iosevka Nerd Font"
-                            font.pixelSize: root.s(19)
-                            color: root.theme.mauve
+                            width: root.s(23)
+                            height: root.s(23)
+                            tint: root.theme.mauve
                         }
                     }
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: root.s(1)
-                        Text {
-                            text: "LPIC Daily"
-                            font.family: root.theme.fontFamily
-                            font.pixelSize: root.s(15)
-                            font.weight: Font.DemiBold
-                            color: root.theme.text
-                        }
-                        Text {
-                            text: "Apprentissage Linux"
-                            font.family: root.theme.fontFamily
-                            font.pixelSize: root.s(11)
-                            color: root.theme.subtext0
-                        }
+                    Text {
+                        text: "LPIC Daily"
+                        font.family: root.theme.fontFamily
+                        font.pixelSize: root.s(15)
+                        font.weight: Font.DemiBold
+                        color: root.theme.text
                     }
+                    Item { Layout.fillWidth: true }
                     Rectangle {
                         id: refreshButton
                         Layout.preferredWidth: root.s(29)
@@ -306,7 +303,7 @@ Item {
                             color: root.theme.text
                         }
                         Text {
-                            text: root.remaining === 0 && root.hasStatus ? "aucune activité due" : "activités restantes"
+                            text: root.hasStatus && root.remaining === 0 ? "aucune activité due" : (root.remaining === 1 ? "activité restante" : "activités restantes")
                             font.family: root.theme.fontFamily
                             font.pixelSize: root.s(13)
                             color: root.theme.subtext0
@@ -315,7 +312,7 @@ Item {
                     Text {
                         Layout.fillWidth: true
                         text: root.hasStatus
-                            ? (root.session.reviews + " révisions · " + root.session.practice + " consolidations · " + root.session.new + " nouveaux concepts")
+                            ? ([root.counted(root.session.reviews, "révision", "révisions"), root.counted(root.session.practice, "consolidation", "consolidations"), root.counted(root.session.new, "nouveau", "nouveaux")].join(" · "))
                             : "En attente des statistiques"
                         elide: Text.ElideRight
                         font.family: root.theme.fontFamily
@@ -411,7 +408,7 @@ Item {
                             font.pixelSize: root.s(17)
                         }
                         Text {
-                            text: "Ouvrir ma séance"
+                            text: "Ouvrir LPIC Daily"
                             color: root.theme.base
                             font.family: root.theme.fontFamily
                             font.pixelSize: root.s(12)

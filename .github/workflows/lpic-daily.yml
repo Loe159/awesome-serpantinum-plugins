@@ -29,3 +29,6 @@ jobs:
           sudo apt-get install -y -qq qt6-declarative-dev-tools
           /usr/lib/qt6/bin/qmlformat lpic-daily/Plugin.qml >/dev/null
           /usr/lib/qt6/bin/qmlformat lpic-daily/ui/BarEntry.qml >/dev/null
+          /usr/lib/qt6/bin/qmlformat lpic-daily/ui/LpiLogo.qml >/dev/null
+      - name: Validate SVG vector
+        run: python3 -c 'import xml.etree.ElementTree as ET; ET.parse("lpic-daily/assets/lpi.svg")'

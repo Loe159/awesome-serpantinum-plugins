@@ -28,7 +28,7 @@ Un clic sur la prochaine activité lance `lpic launch --next` dans un terminal.
 LPIC Daily recalcule la recommandation au moment du lancement ; les prérequis
 et le choix cours/quiz/lab restent gérés par la TUI, avec les labs tmux habituels.
 
-« Ouvrir ma séance » lance simplement `lpic`.
+« Ouvrir LPIC Daily » ouvre le tableau de bord de la TUI (`lpic`).
 Les notifications restent gérées par LPIC Daily : aucun rappel doublon.
 
 La popup utilise la palette, la typographie et le facteur d'échelle du thème
@@ -45,3 +45,15 @@ python3 -m unittest discover -s lpic-daily/services -p 'test_*.py'
 
 Les tests d'intégration QML nécessitent une session Serpantinum/Quickshell
 et sont distincts des tests Python.
+
+## Identité visuelle
+
+Le symbole de Linux Professional Institute est utilisé en version monochrome
+(adaptée à la couleur d'accent du thème Serpantinum) dans la Bar, la popup et
+les Paramètres. Source vectorielle : [Simple Icons](https://simpleicons.org/icons/linuxprofessionalinstitute),
+marque appartenant à Linux Professional Institute ; il ne s'agit pas d'un
+badge de certification ni d'une affiliation officielle.
+
+La carte du plugin utilise l'option `iconImage`, disponible dans le gestionnaire
+de plugins Serpantinum mis à jour. La Bar et la popup utilisent leur propre
+composant vectoriel et gardent la couleur du thème à chaud.
