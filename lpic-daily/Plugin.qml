@@ -327,12 +327,20 @@ Item {
                             font.pixelSize: root.s(15)
                             color: root.theme.text
                             RotationAnimation on rotation {
-                                from: 0; to: 360; duration: 900; loops: Animation.Infinite
-                                running: statusProcess.running
+                                id: refreshRotation
+                                from: 0; to: 360; duration: 1200; loops: 1
+                                easing.type: Easing.InOutSine
+                                running: false
                             }
                         }
                         HoverHandler { id: refreshHover; cursorShape: Qt.PointingHandCursor }
-                        TapHandler { id: refreshTap; onTapped: root.refresh() }
+                        TapHandler {
+                            id: refreshTap
+                            onTapped: {
+                                refreshRotation.restart();
+                                root.refresh();
+                            }
+                        }
                     }
                 }
 

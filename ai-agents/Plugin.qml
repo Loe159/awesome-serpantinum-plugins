@@ -77,7 +77,37 @@ Item {
                 RowLayout { Layout.fillWidth:true
                     Text { text:"󰚩  Codex"; color:root.theme.text; font.family:root.theme.fontFamily; font.pixelSize:root.s(16); font.bold:true }
                     Item { Layout.fillWidth:true }
-                    Button { text:"Refresh"; onClicked:codex.refresh() }
+                    Rectangle {
+                        id: refreshButton
+                        Layout.preferredWidth: root.s(29)
+                        Layout.preferredHeight: root.s(29)
+                        radius: root.s(8)
+                        color: refreshHover.hovered ? root.theme.surface1 : root.theme.surface0
+                        Behavior on color { ColorAnimation { duration: 170 } }
+                        scale: refreshTap.pressed ? 0.985 : (refreshHover.hovered ? 1.015 : 1)
+                        Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                        Text {
+                            anchors.centerIn: parent
+                            text: "󰑐"
+                            font.family: "Iosevka Nerd Font"
+                            font.pixelSize: root.s(15)
+                            color: root.theme.text
+                            RotationAnimation on rotation {
+                                id: refreshRotation
+                                from: 0; to: 360; duration: 1200; loops: 1
+                                easing.type: Easing.InOutSine
+                                running: false
+                            }
+                        }
+                        HoverHandler { id: refreshHover; cursorShape: Qt.PointingHandCursor }
+                        TapHandler {
+                            id: refreshTap
+                            onTapped: {
+                                refreshRotation.restart();
+                                codex.refresh();
+                            }
+                        }
+                    }
                     Button { text:"⚙"; onClicked:{root.showSettings=!root.showSettings;root.showNewAgent=false} }
                     Button { text:"×"; onClicked:root.panelVisible=false }
                 }
