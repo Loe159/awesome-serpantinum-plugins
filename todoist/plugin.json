@@ -1,0 +1,16 @@
+{
+  "id": "todoist",
+  "name": "Todoist",
+  "version": "0.1.0",
+  "apiVersion": 1,
+  "entry": "Plugin.qml",
+  "enabledByDefault": true,
+  "topbarByDefault": false,
+  "capabilities": ["panel", "bar", "notifications"],
+  "icon": "󰄬",
+  "barColor": "red",
+  "description": "Vos tâches Todoist dans la Bar Serpantinum.",
+  "barEntry": "ui/BarEntry.qml",
+  "iconImage": "assets/todoist.svg",
+  "iconImageMonochrome": false
+}
