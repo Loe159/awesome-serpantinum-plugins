@@ -21,13 +21,11 @@ Item {
         rowSpacing: host ? host.s(1) : 1
         columnSpacing: host ? host.s(6) : 6
 
-        Text {
+        LpiLogo {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            text: "󰬛"
-            font.family: "Iosevka Nerd Font"
-            font.pixelSize: host ? host.s(host.compact ? 11 : 13) : 13
-            color: root.accent
-            Behavior on color { ColorAnimation { duration: 220; easing.type: Easing.OutCubic } }
+            Layout.preferredWidth: host ? host.s(host.compact ? 12 : 14) : 14
+            Layout.preferredHeight: host ? host.s(host.compact ? 12 : 14) : 14
+            tint: root.accent
         }
 
         Text {
